@@ -4,10 +4,10 @@ __pycache__/
 
 # Egg-info directory
 conformal_envelopes.egg-info/
-*.egg-info/
+*.egg-info
 
 # Project configuration (temporary)
 pyproject.toml
 
 # Test directory/files
-test_library/
+test_library.py
