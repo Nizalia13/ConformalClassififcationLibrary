@@ -6,7 +6,21 @@ __pycache__/
 conformal_envelopes.egg-info/
 *.egg-info
 
-# Project configuration (temporary)
+# Project configuration 
 pyproject.toml
 
 /examples/
+
+football_all_positions_example.ipynb
+
+.venv
+
+# # Downloaded football source data and reproducible notebook exports
+# /data/football/*.csv
+# /data/football/*.tmp
+/outputs/football/
+# /data/football_players/*.csv
+# /data/football_players/*.tmp
+/outputs/football_players/
+/outputs/football_diagnosis/
+/outputs/football_all_positions/

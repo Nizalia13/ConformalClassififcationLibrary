@@ -116,6 +116,37 @@ samples missing one plotted coordinate.
 Pass `ax` to arrange plots in separate figures or a shared figure.
 
 
+## Guided football example
+
+Use [`football_player_positions_example.ipynb`](football_player_positions_example.ipynb)
+as the main football example. It classifies 18,147 distinct FIFA 19 players
+as Defender, Midfielder, Attacker, or Goalkeeper from 34 individual skill ratings.
+Four classifiers (logistic regression, random forest, gradient boosting, and an
+RBF support-vector classifier) produce the scores. Position-specific suitability
+ratings and identity fields are excluded from the predictors.
+This is classification of recorded roles in a historical game-data
+snapshot, not a forecast of match outcomes or future player performance.
+
+Run all cells using a Python kernel with the `[examples]` dependencies installed.
+The notebook works independently of the other notebooks and uses the local library.
+Its first run downloads a commit-pinned CSV from an attributed public mirror;
+later runs use the hash-verified cache in `data/football_players/` and work offline.
+It explains the data, four disjoint partitions, four classifiers, all three
+envelope methods, classwise coverage, set sizes, empty sets, and envelope plots.
+Results and provenance are exported to `outputs/football_players/`.
+
+The four partitions use approximately 40% classifier training, 20% validation,
+30% conformal fitting, and 10% testing. Actual counts and results are displayed
+in the notebook and exported with the run configuration.
+
+[`football_all_positions_example.ipynb`](football_all_positions_example.ipynb)
+is a separate independent experiment with all 27 recorded positions, including GK.
+It retains 18,147 players and includes the five goalkeeper skill attributes.
+It reports classwise calibration counts, infinite thresholds for rare labels,
+goalkeeper versus outfield results, and 27-class inclusion heatmaps. Its outputs
+go to `outputs/football_all_positions/`. The coverage target remains 90%; no rare
+labels are removed or infinite thresholds capped to make the sets smaller.
+
 ## Tests
 
 ```bash
