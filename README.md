@@ -86,16 +86,35 @@ score_direction, and force_nonempty.
 
 ## Visualisation
 
-Both plotting methods display nonconformity coordinates.
+There are three plotting options:
 
-- model.plot(...) fits a separate two-dimensional envelope using the selected predictors.
-- model.plot_slice(...) displays a slice of the existing fitted envelope, fixing the other coordinates 
-at training median nonconformity values.
+- `model.plot(...)`: fits a separate two-dimensional envelope using
+  the two selected predictors. Test-point categories describe decisions
+  from this separate 2D envelope.
 
-For slice plots, test-point categories use the full-dimensional decision. A point's displayed position 
-relative to the slice may therefore differ from its acceptance category.
+- `model.plot_slice(...)`: displays a cross-section of the existing
+  fitted envelope without refitting. Hidden coordinates default to zero.
+  Use `slice_values` to specify their fixed nonconformity values.
+  The plot displays these values above the axes.
 
-Use test_data to display test samples and show_training to control whether training samples are also shown.
+- `plot_inclusion_heatmap(...)`: shows how frequently each candidate
+  class appears in prediction sets, grouped by the true class.
+  Diagonal entries give per-class coverage. Rows need not sum to one
+  because prediction sets can contain multiple labels.
+
+Envelope plots use nonconformity coordinates. With
+`score_direction="higher_is_better"`, these equal `1 - score`.
+
+In slice plots, test-point categories use each sample's actual
+full-dimensional scores. Their acceptance may therefore differ from
+what their displayed position relative to the slice suggests.
+
+Use `test_data` to show test samples, `show_training` to display
+training samples, and `show_missing` to display dotted lines for
+samples missing one plotted coordinate.
+
+Pass `ax` to arrange plots in separate figures or a shared figure.
+
 
 ## Tests
 
