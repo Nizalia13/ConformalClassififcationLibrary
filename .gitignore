@@ -9,5 +9,4 @@ conformal_envelopes.egg-info/
 # Project configuration (temporary)
 pyproject.toml
 
-# Test directory/files
-test_library.py
+/examples/
