@@ -236,8 +236,8 @@ def _plot_2d(model, *, x, y, label, test_data, grid_size, show_training, show_ot
 
 #############################################################################################################################################
 
-def _plot_envelope_slice(model, *, x, y, label, test_data, show_training=False, show_missing=True, 
-                         grid_size=160, ax=None,):
+def _plot_envelope_slice(model, *, x, y, label, test_data, slice_values=None, show_training=False,
+                         show_missing=True, grid_size=160, ax=None,):
     import matplotlib.pyplot as plt
     from matplotlib.patches import Patch
 
@@ -287,13 +287,43 @@ def _plot_envelope_slice(model, *, x, y, label, test_data, show_training=False, 
 
     test_nc = to_nc(test_frame)
 
-    # Fix unplotted coordinates at training medians.
-    # This chooses the slice; it does not modify the fitted envelope.
-    reference = np.array([np.median(column[np.isfinite(column)]) if np.isfinite(column).any() else np.nan
-                          for column in train_nc.T])
+    # # Fix unplotted coordinates at training medians.
+    # # This chooses the slice; it does not modify the fitted envelope.
+    # reference = np.array([np.median(column[np.isfinite(column)]) if np.isfinite(column).any() else np.nan
+    #                       for column in train_nc.T])
 
-    if any(not np.isfinite(reference[j]) for j in retained):
-        raise ValueError("Cannot define the median slice: an active column has no finite training values.")
+    # if any(not np.isfinite(reference[j]) for j in retained):
+    #     raise ValueError("Cannot define the median slice: an active column has no finite training values.")
+
+    # Hidden coordinates default to zero in nonconformity space.
+    reference = np.zeros(len(columns), dtype=float)
+
+    if slice_values is None:
+        slice_values = {}
+
+    if not isinstance(slice_values, dict):
+        raise TypeError("slice_values must be a dictionary of column names and nonconformity values.")
+
+    hidden_columns = {columns[j] for j in retained if j not in {ix, iy}}
+
+    for column, value in slice_values.items():
+        if column not in hidden_columns:
+            raise ValueError(f"{column!r} is not an active hidden coordinate. "
+                             f"Choose from: {sorted(hidden_columns, key=str)}")
+
+        if (isinstance(value, (bool, np.bool_)) or not np.isscalar(value) 
+            or isinstance(value, (str, bytes))):
+            raise ValueError(f"Slice value for {column!r} must be a finite, nonnegative number.")
+
+        try:
+            value = float(value)
+        except (TypeError, ValueError, OverflowError):
+            raise ValueError(f"Slice value for {column!r} must be a finite, nonnegative number.") from None
+
+        if not np.isfinite(value) or value < 0:
+            raise ValueError(f"Slice value for {column!r} must be finite and nonnegative.")
+
+        reference[columns.index(column)] = value
 
     # Include test coordinates so outside points remain visible.
     display_nc = np.concatenate((train_nc, test_nc), axis=0)
@@ -398,7 +428,8 @@ def _plot_envelope_slice(model, *, x, y, label, test_data, show_training=False, 
         ax.text(0.02, 0.02, "\n".join(notes), transform=ax.transAxes, va="bottom", fontsize=8,
                  bbox=dict(facecolor="white", alpha=0.85, edgecolor="none",), zorder=5,)
 
-    region = Patch(facecolor="#b8dfba", alpha=0.4, label="Accepted region on median slice",)
+    # region = Patch(facecolor="#b8dfba", alpha=0.4, label="Accepted region on median slice",)
+    region = Patch(facecolor="#b8dfba", alpha=0.4, label="Accepted region on specified slice",)
 
     handles, labels = ax.get_legend_handles_labels()
 
@@ -413,6 +444,18 @@ def _plot_envelope_slice(model, *, x, y, label, test_data, show_training=False, 
 
     ax.set(xlabel=x, ylabel=y, title=f"{model.method.capitalize()}: slice for {label}",
             xlim=(0.0, xhi), ylim=(0.0, yhi),)
+
+    # Show the actual fixed values of all active hidden coordinates.
+    fixed_values = [f"{columns[j]} = {reference[j]:.3g}" for j in sorted(retained)
+                    if j not in {ix, iy}]
+
+    subtitle = ("Fixed: " + ", ".join(fixed_values) if fixed_values
+                 else "No hidden coordinates")
+
+    ax.set_title(f"{model.method.capitalize()}: slice for {label}", pad=32,)
+
+    ax.text(0.5, 1.02, subtitle, transform=ax.transAxes, ha="center", va="bottom",
+            fontsize=9,color="dimgray",)
 
     return ax
 

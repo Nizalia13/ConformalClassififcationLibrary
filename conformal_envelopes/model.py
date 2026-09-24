@@ -592,17 +592,35 @@ class ConformalSetModel:
 
 #################################################################################################################################3
 
-    def plot_slice(self, *, x, y, label, test_data, show_training=False, show_missing=True, 
-                   grid_size=160, ax=None,):
-        """
-           Plot a slice of the existing fitted envelope without refitting.
+    # def plot_slice(self, *, x, y, label, test_data, show_training=False, show_missing=True, 
+    #                grid_size=160, ax=None,):
+    #     """
+    #        Plot a slice of the existing fitted envelope without refitting.
 
-           Unplotted coordinates are fixed at training median nonconformity values. Test colours show full-model membership.
+    #        Unplotted coordinates are fixed at training median nonconformity values. Test colours show full-model membership.
+    #     """
+    #     from .plotting import _plot_envelope_slice
+    #     self._check_fitted()
+
+    #     return _plot_envelope_slice(self, x=x, y=y, label=label, test_data=test_data, show_training=show_training,
+    #                                 show_missing=show_missing, grid_size=grid_size, ax=ax,)
+
+    def plot_slice(self, *, x, y, label, test_data, slice_values=None, show_training=False,
+                   show_missing=True, grid_size=160, ax=None,):
+        """
+           Plot a slice of the existing envelope without refitting.
+
+           Hidden coordinates default to zero in nonconformity space.
+           Pass a dictionary mapping hidden score-column names to nonnegative values to choose a different slice.
+
+        Test colours show full-model decisions using actual scores.
         """
         from .plotting import _plot_envelope_slice
+
         self._check_fitted()
 
-        return _plot_envelope_slice(self, x=x, y=y, label=label, test_data=test_data, show_training=show_training,
+        return _plot_envelope_slice(self, x=x, y=y, label=label, test_data=test_data,
+                                    slice_values=slice_values, show_training=show_training,
                                     show_missing=show_missing, grid_size=grid_size, ax=ax,)
 
 #################################################################################################################################3
